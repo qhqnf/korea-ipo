@@ -44,6 +44,7 @@ class Dart:
             print("Request failure")
             return False, []
 
+    @staticmethod
     def get_ipo_data_from_disclosure_data(raw_disclosure_data: List) -> Dict:
         ipo_data = {}
         
