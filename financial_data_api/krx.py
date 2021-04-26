@@ -27,6 +27,6 @@ class Krx:
         res = requests.post(Krx.DOWNLOAD_URL, headers=headers, params=params)
         res.encoding = "utf-8-sig"
         
-        stock_data = pd.read_csv(io.BytesIO(data.content), header=0, thousands=",").iloc[:, 0:3]
+        stock_data = pd.read_csv(io.BytesIO(res.content), header=0, thousands=",").iloc[:, 0:3]
 
         return stock_data
