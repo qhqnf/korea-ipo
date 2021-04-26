@@ -71,7 +71,6 @@ class Dart:
         }
         url = "https://opendart.fss.or.kr/api/document.xml"
         res = requests.get(url, params=params)
-        file = zipfile.ZipFile(io.BytesIO(res.content))
         with zipfile.ZipFile(io.BytesIO(res.content)) as zip_file:
             xml_file = f"{receipt_num}.xml"
             with zip_file.open(xml_file) as f:
