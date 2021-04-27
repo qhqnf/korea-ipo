@@ -1,10 +1,14 @@
 import os
 import io
-import requests
+import re
 import zipfile
+import logging
+from traceback import print_exc
+from typing import List, Dict, Tuple
+
+import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from typing import List, Dict, Tuple
 load_dotenv()
 
 class Dart:
@@ -29,22 +33,22 @@ class Dart:
                 raw_disclosure_data = data["list"]
                 return True, raw_disclosure_data
             elif status == "011":
-                print(f"Invalid key: {message}")
+                logging.error(f"Invalid key: {message}")
                 return False, []
             elif status == "020":
-                print(f"Exceed request limit: {message}")
+                logging.error(f"Exceed request limit: {message}")
                 return False, []
             elif status == "100":
-                print(f"Invalid parameter field error: {message}")
+                logging.error(f"Invalid parameter field error: {message}")
                 return False, []
             elif status == "800":
-                print(f"API service is now in maintainance: {message}")
+                logging.error(f"API service is now in maintainance: {message}")
                 return False, []
             else:
-                print(f"Unknown Error: {message}")
+                logging.error(f"Unknown Error: {message}")
                 return False, []
         else:
-            print("Request failure")
+            logging.error("Request failure")
             return False, []
 
     @staticmethod
@@ -79,26 +83,22 @@ class Dart:
         return ipo_xml_data
 
     @staticmethod
-    def try_get_ipo_detail_from_xml(ipo_xml_data) -> Tuple[bool, Dict]:
-        try:
-            soup = BeautifulSoup(ipo_xml_data, 'html.parser')
-            detail_data_part = soup.find('body').find_all('part')[1]
-            detail_data_part = detail_data_part.find("section-1").find("section-2").find_all("table")[1:]
-            company_data_table = detail_data_part[1]
-            schedule_data_table = detail_data_part[2]
+    def get_ipo_detail_from_xml(ipo_xml_data) -> Dict:
+        soup = BeautifulSoup(ipo_xml_data, 'html.parser')
+        detail_data_part = soup.find('body').find_all('part')[1]
+        detail_data_part = detail_data_part.find("section-1").find("section-2").find_all("table")[1:]
+        company_data_table = detail_data_part[1]
+        schedule_data_table = detail_data_part[2]
 
-            schedule_data = Dart.get_schedule_data_from_table(schedule_data_table)
-            company_data = Dart.get_company_data_from_table(company_data_table)
+        schedule_data = Dart.get_schedule_data_from_table(schedule_data_table)
+        company_data = Dart.get_company_data_from_table(company_data_table)
 
-            ipo_detail_data = {
-                **schedule_data,
-                "company_data": company_data
-            }
-            
-            return True, ipo_detail_data
+        ipo_detail_data = {
+            **schedule_data,
+            "company_data": company_data
+        }
         
-        except:
-            return False, {}
+        return ipo_detail_data
 
     @staticmethod
     def get_schedule_data_from_table(schedule_data_table):
@@ -110,7 +110,7 @@ class Dart:
         for header, row in zip(headers, rows):
             if header == "청약기일":
                 row = row.split("~")[1].strip()
-            schedule_data[header] = row
+            schedule_data[header] = re.sub("[^0-9]", "", row)
         return schedule_data
 
     @staticmethod

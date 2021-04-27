@@ -1,32 +1,23 @@
+import logging
+from traceback import print_exc
+
 import requests
-import datetime
-import re
-import io
 import pandas as pd
 
 class Krx:
-    DOWNLOAD_URL = "http://file.krx.co.kr/download.jspx"
+    BASE_URL = "http://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd"
+    headers = {"User-Agent": "Mozilla/5.0"}
 
     @staticmethod
-    def generate_otp():
-        # params
-        # requests
-        # otp = res.text
-        # return otp
-        pass
-
-    @staticmethod
-    def get_stock_data(otp: str):
-        headers = {
-            "User-Agent": "Mozilla/5.0",
-            "Referer": "http://marketdata.krx.co.kr/mdi",
-        }
+    def get_ticker_data() -> pd.DataFrame:
         params = {
-            "code": otp
+            "bld": "dbms/comm/finder/finder_stkisu",
+            "mktsel": "ALL",
         }
-        res = requests.post(Krx.DOWNLOAD_URL, headers=headers, params=params)
-        res.encoding = "utf-8-sig"
-        
-        stock_data = pd.read_csv(io.BytesIO(res.content), header=0, thousands=",").iloc[:, 0:3]
 
-        return stock_data
+        res = requests.post(Krx.BASE_URL, headers=Krx.headers, params=params)
+        data = res.json()
+        data = pd.DataFrame(data['block1']).iloc[:, 1:3]
+        data = data.rename(columns={"short_code": "code", "codeName": "name"})
+        
+        return data
