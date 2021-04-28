@@ -87,15 +87,15 @@ class Dart:
         soup = BeautifulSoup(ipo_xml_data, 'html.parser')
         detail_data_part = soup.find('body').find_all('part')[1]
         detail_data_part = detail_data_part.find("section-1").find("section-2").find_all("table")[1:]
-        company_data_table = detail_data_part[1]
+        security_company_data_table = detail_data_part[1]
         schedule_data_table = detail_data_part[2]
 
         schedule_data = Dart.get_schedule_data_from_table(schedule_data_table)
-        company_data = Dart.get_company_data_from_table(company_data_table)
+        security_company_data = Dart.get_security_company_data_from_table(security_company_data_table)
 
         ipo_detail_data = {
             **schedule_data,
-            "company_data": company_data
+            "security_company_data": security_company_data
         }
         
         return ipo_detail_data
@@ -114,11 +114,11 @@ class Dart:
         return schedule_data
 
     @staticmethod
-    def get_company_data_from_table(company_data_table):
-        company_data = []
-        headers = company_data_table.find('thead').find_all('th')[0:3:2]
+    def get_security_company_data_from_table(security_company_data_table):
+        security_company_data = []
+        headers = security_company_data_table.find('thead').find_all('th')[0:3:2]
         headers = [cell.text for cell in headers]
-        rows = company_data_table.find('tbody').find_all('tr')
+        rows = security_company_data_table.find('tbody').find_all('tr')
         rows = [row.find_all('td')[1:4:2] for row in rows]
         for row in rows:
             temp = {}
@@ -127,5 +127,5 @@ class Dart:
                     temp[header] = cell.text
                 elif header == "인수수량":
                     temp[header] = int(cell.text.replace(",", "").rstrip())
-            company_data.append(temp)
-        return company_data
+            security_company_data.append(temp)
+        return security_company_data
