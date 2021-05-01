@@ -129,3 +129,5 @@ class Dart:
                     temp[header] = int(cell.text.replace(",", "").rstrip())
             security_company_data.append(temp)
         return security_company_data
+
+    # TODO: add get_price_band_from_table
