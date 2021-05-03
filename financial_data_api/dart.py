@@ -85,17 +85,20 @@ class Dart:
     @staticmethod
     def get_ipo_detail_from_xml(ipo_xml_data) -> Dict:
         soup = BeautifulSoup(ipo_xml_data, 'html.parser')
-        detail_data_part = soup.find('body').find_all('part')[1]
-        detail_data_part = detail_data_part.find("section-1").find("section-2").find_all("table")[1:]
+        detail_data_part = soup.find('body').find_all('part')[1].find("section-1").find_all("section-2")
+        price_band_data_table = detail_data_part[2].find_all("table")[3]
+        detail_data_part = detail_data_part[0].find_all("table")[1:]
         security_company_data_table = detail_data_part[1]
         schedule_data_table = detail_data_part[2]
 
         schedule_data = Dart.get_schedule_data_from_table(schedule_data_table)
         security_company_data = Dart.get_security_company_data_from_table(security_company_data_table)
+        price_band_data = Dart.get_price_band_data_from_table(price_band_data_table)
 
         ipo_detail_data = {
             **schedule_data,
-            "security_company_data": security_company_data
+            "security_company_data": security_company_data,
+            **price_band_data
         }
         
         return ipo_detail_data
@@ -130,4 +133,14 @@ class Dart:
             security_company_data.append(temp)
         return security_company_data
 
-    # TODO: add get_price_band_from_table
+    @staticmethod
+    def get_price_band_data_from_table(price_band_data_table):
+        rows = price_band_data_table.find("tbody").find("tr").find_all("td")
+        price_band = rows[1].text.split('~')
+        min_price_band = "".join(filter(lambda x: x.isnumeric(), price_band[0]))
+        max_price_band = "".join(filter(lambda x: x.isnumeric(), price_band[1]))
+        price_band_data = {
+            "min_price_band": int(min_price_band),
+            "max_price_band": int(max_price_band)
+        }
+        return price_band_data
