@@ -18,10 +18,11 @@ class Ipo:
     company_name: str
     start_date: str
     payment_date: str
-    security_company_set: list[SecurityCompany]
+    security_company_set: list
     max_price_band: int
     min_price_band: int
     price: int
+    receipt_num: int
 
     def __init__(self, **kwargs):
         self.company_code = kwargs["company_code"]
@@ -32,6 +33,7 @@ class Ipo:
         self.max_price_band = kwargs["max_price_band"]
         self.min_price_band = kwargs["min_price_band"]
         self.price = kwargs.get("price", 0)
+        self.receipt_num = kwargs["receipt_num"]
     
     def asdict(self):
         return asdict(self)

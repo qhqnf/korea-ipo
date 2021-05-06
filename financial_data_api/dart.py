@@ -15,8 +15,12 @@ class Dart:
     API_KEY = os.environ.get("DART_API_KEY")
 
     @staticmethod
-    def try_get_raw_disclosure_data(start_date: str, end_date: str) -> Tuple[bool, List]:
+    def try_get_raw_disclosure_data(start_date: str=None, end_date: str=None) -> Tuple[bool, List]:
         BASE_URL = "https://opendart.fss.or.kr/api/list.json"
+        if end_date is None:
+            end_date = datetime.today().strftime("%Y%m%d")
+        if start_date is None:
+            start_date = end_date
         params = {
             "crtfc_key": Dart.API_KEY,
             "bgn_de": start_date,
