@@ -1,4 +1,4 @@
 # Korea ipo data collector / parser
 
-* flask-serverless framework version
+* Link below: flask-serverless framework version
 * [serverless-flask](https://github.com/qhqnf/flask-serverless)
