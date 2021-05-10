@@ -41,12 +41,7 @@ def lambda_handler(event, context):
         receipt_num = int(data["rcept_no"])
         try:
             ipo_xml_data = Dart.get_ipo_xml_data(receipt_num)
-            ipo_detail_data = Dart.get_ipo_detail_from_xml(ipo_xml_data)   
-            temp = {
-                "company_code": company_code,
-                "company_name": company_name,
-                **ipo_detail_data
-            }
+            ipo_detail_data = Dart.get_ipo_detail_from_xml(ipo_xml_data)
             ipo = Ipo(
                 company_code=company_code,
                 company_name=company_name,
